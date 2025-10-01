@@ -4,8 +4,14 @@ import { useState } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./components/ui/card"
 import { Activity, Radio, Brain, Waves, Plane } from "lucide-react"
-import ECGMonitor from "./components/ecg-monitor"
-import DopplerAnalysis from "./components/doppler-analysis"
+
+import { lazy,Suspense } from "react"
+
+const ECGMonitor = lazy(() => import("./components/ecg-monitor"))
+
+const DopplerAnalysis = lazy(() => import("./components/doppler-analysis"))
+
+const DroneTelemetry = lazy(() => import("./components/drone-telemetry"))
 
 export default function App() {
   const [activeTab, setActiveTab] = useState("ecg")
@@ -55,11 +61,15 @@ export default function App() {
           </TabsList>
 
           <TabsContent value="ecg" className="space-y-4">
-            <ECGMonitor />
+            <Suspense fallback={<div className="text-center text-muted-foreground">Loading ECG Monitor...</div>}>
+              <ECGMonitor />
+            </Suspense>
           </TabsContent>
 
           <TabsContent value="doppler" className="space-y-4">
-            <DopplerAnalysis />
+            <Suspense fallback={<div className="text-center text-muted-foreground">Loading Doppler Analysis...</div>}>
+              <DopplerAnalysis />
+            </Suspense>
           </TabsContent>
 
           <TabsContent value="eeg" className="space-y-4">
@@ -109,26 +119,9 @@ export default function App() {
           </TabsContent>
 
           <TabsContent value="drones" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Plane className="h-5 w-5 text-secondary" />
-                  Drone Telemetry Module
-                </CardTitle>
-                <CardDescription>UAV signal processing and telemetry analysis</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-center h-64 border-2 border-dashed border-border rounded-lg">
-                  <div className="text-center">
-                    <Plane className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <p className="text-muted-foreground">Drone telemetry module coming soon</p>
-                    <p className="text-sm text-muted-foreground mt-2">
-                      This section will include RF signal analysis and flight data processing
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <Suspense fallback={<div className="text-center text-muted-foreground">Loading Drone Telemetry...</div>}>
+              <DroneTelemetry />
+            </Suspense>
           </TabsContent>
         </Tabs>
       </main>

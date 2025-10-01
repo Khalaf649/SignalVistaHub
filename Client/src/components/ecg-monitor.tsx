@@ -1,5 +1,5 @@
 "use client"
-
+import { lazy } from "react"
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card"
 import { Label } from "./ui/label"
@@ -7,10 +7,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Input } from "./ui/input"
 import { Button } from "./ui/button"
 import { Activity, Play, Pause, RotateCcw, AlertCircle } from "lucide-react"
-import LinearECGPlot from "./ecg-linear-plot"
-import PolarECGPlot from "./ecg-polar-plot"
-import RecurrencePlot from "./ecg-recurrence-plot"
+const LinearECGPlot = lazy(() => import("./ecg-linear-plot"))
+const PolarECGPlot = lazy(() => import("./ecg-polar-plot"))
+const RecurrencePlot = lazy(() => import("./ecg-recurrence-plot"))
 import { getAvailablePatients, loadECGRecording, type ECGRecording } from "../data/ecg-data-loader"
+
 
 export default function ECGMonitor() {
   const [availablePatients, setAvailablePatients] = useState<string[]>([])
@@ -25,11 +26,16 @@ export default function ECGMonitor() {
   const [plotMode, setPlotMode] = useState<"linear" | "polar">("linear")
 
   useEffect(() => {
+    console.log("rendering ......")
     const patients = getAvailablePatients()
+  
+    
     setAvailablePatients(patients)
     if (patients.length > 0) {
       setSelectedPatient(patients[0])
+    
     }
+    console.log("Available patients:", patients)
   }, [])
 
   const handleLoadRecording = async () => {

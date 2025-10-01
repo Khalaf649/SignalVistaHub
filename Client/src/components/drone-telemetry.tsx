@@ -1,389 +1,230 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import type React from "react"
+
+import { useState, useRef } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card"
 import { Label } from "./ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
 import { Button } from "./ui/button"
-import { Plane, Play, Pause, RotateCcw } from "lucide-react"
+import { Plane, Upload, Loader2, CheckCircle2, XCircle } from "lucide-react"
+import { Input } from "./ui/input"
+import { useToast } from "../hooks/use-toast"
 
-interface DroneSignal {
-  timestamp: number
-  signalStrength: number
-  gpsQuality: number
-  controlLatency: number
-  altitude: number
+interface PredictionResult {
+  classification: string
+  confidence: number
+  status: string
 }
 
 export default function DroneTelemetry() {
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [droneId, setDroneId] = useState("drone-1")
-  const [signalData, setSignalData] = useState<DroneSignal[]>([])
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-  const gpsCanvasRef = useRef<HTMLCanvasElement>(null)
-  const latencyCanvasRef = useRef<HTMLCanvasElement>(null)
-  const animationRef = useRef<number>()
-  const timeRef = useRef(0)
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [isUploading, setIsUploading] = useState(false)
+  const [predictionResult, setPredictionResult] = useState<PredictionResult | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const { toast } = useToast()
 
-  const DRONES = [
-    { id: "drone-1", name: "Alpha Unit" },
-    { id: "drone-2", name: "Beta Unit" },
-    { id: "drone-3", name: "Gamma Unit" },
-    { id: "drone-4", name: "Delta Unit" },
-  ]
-
-  // Generate realistic drone telemetry signal
-  const generateSignal = (t: number): DroneSignal => {
-    const baseFreq = droneId === "drone-1" ? 0.5 : droneId === "drone-2" ? 0.7 : droneId === "drone-3" ? 0.6 : 0.8
-
-    // Signal strength with interference
-    const signalStrength =
-      -40 + 15 * Math.sin(2 * Math.PI * baseFreq * t) + 5 * Math.sin(2 * Math.PI * 2.3 * t) + 3 * Math.random()
-
-    // GPS quality (0-100%)
-    const gpsQuality = 70 + 20 * Math.sin(2 * Math.PI * 0.3 * t) + 10 * Math.random()
-
-    // Control latency in ms
-    const controlLatency = 50 + 20 * Math.sin(2 * Math.PI * 0.4 * t) + 15 * Math.random()
-
-    // Altitude variation
-    const altitude = 100 + 30 * Math.sin(2 * Math.PI * 0.2 * t) + 10 * Math.random()
-
-    return {
-      timestamp: t,
-      signalStrength: Math.max(-80, Math.min(-20, signalStrength)),
-      gpsQuality: Math.max(0, Math.min(100, gpsQuality)),
-      controlLatency: Math.max(10, Math.min(150, controlLatency)),
-      altitude: Math.max(50, Math.min(200, altitude)),
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file) {
+      // Check if file is audio
+      if (!file.type.startsWith("audio/")) {
+        toast({
+          title: "Invalid file type",
+          description: "Please select an audio file",
+          variant: "destructive",
+        })
+        return
+      }
+      setSelectedFile(file)
+      setPredictionResult(null)
     }
   }
 
-  // Draw signal strength plot
-  const drawSignalPlot = (canvas: HTMLCanvasElement, data: DroneSignal[]) => {
-    const ctx = canvas.getContext("2d")
-    if (!ctx) return
-
-    const width = canvas.width
-    const height = canvas.height
-
-    // Clear canvas
-    ctx.fillStyle = "#0a0a0a"
-    ctx.fillRect(0, 0, width, height)
-
-    // Draw grid
-    ctx.strokeStyle = "#27272a"
-    ctx.lineWidth = 1
-    for (let i = 0; i <= 5; i++) {
-      const y = (i * height) / 5
-      ctx.beginPath()
-      ctx.moveTo(0, y)
-      ctx.lineTo(width, y)
-      ctx.stroke()
-    }
-
-    if (data.length < 2) return
-
-    // Draw signal strength
-    ctx.strokeStyle = "#3b82f6"
-    ctx.lineWidth = 2
-    ctx.beginPath()
-
-    data.forEach((point, i) => {
-      const x = (i / Math.max(data.length - 1, 1)) * width
-      const normalized = (point.signalStrength + 80) / 60 // Map -80 to -20 dBm to 0-1
-      const y = height - normalized * height
-
-      if (i === 0) {
-        ctx.moveTo(x, y)
-      } else {
-        ctx.lineTo(x, y)
-      }
-    })
-    ctx.stroke()
-
-    // Draw labels
-    ctx.fillStyle = "#a1a1aa"
-    ctx.font = "12px monospace"
-    ctx.fillText("-20 dBm", 5, 15)
-    ctx.fillText("-80 dBm", 5, height - 5)
-    ctx.fillText("Signal Strength", width / 2 - 50, 15)
-  }
-
-  // Draw GPS quality plot
-  const drawGPSPlot = (canvas: HTMLCanvasElement, data: DroneSignal[]) => {
-    const ctx = canvas.getContext("2d")
-    if (!ctx) return
-
-    const width = canvas.width
-    const height = canvas.height
-
-    ctx.fillStyle = "#0a0a0a"
-    ctx.fillRect(0, 0, width, height)
-
-    // Draw grid
-    ctx.strokeStyle = "#27272a"
-    ctx.lineWidth = 1
-    for (let i = 0; i <= 5; i++) {
-      const y = (i * height) / 5
-      ctx.beginPath()
-      ctx.moveTo(0, y)
-      ctx.lineTo(width, y)
-      ctx.stroke()
-    }
-
-    if (data.length < 2) return
-
-    // Draw GPS quality
-    ctx.strokeStyle = "#10b981"
-    ctx.lineWidth = 2
-    ctx.beginPath()
-
-    data.forEach((point, i) => {
-      const x = (i / Math.max(data.length - 1, 1)) * width
-      const y = height - (point.gpsQuality / 100) * height
-
-      if (i === 0) {
-        ctx.moveTo(x, y)
-      } else {
-        ctx.lineTo(x, y)
-      }
-    })
-    ctx.stroke()
-
-    // Draw labels
-    ctx.fillStyle = "#a1a1aa"
-    ctx.font = "12px monospace"
-    ctx.fillText("100%", 5, 15)
-    ctx.fillText("0%", 5, height - 5)
-    ctx.fillText("GPS Quality", width / 2 - 40, 15)
-  }
-
-  // Draw latency plot
-  const drawLatencyPlot = (canvas: HTMLCanvasElement, data: DroneSignal[]) => {
-    const ctx = canvas.getContext("2d")
-    if (!ctx) return
-
-    const width = canvas.width
-    const height = canvas.height
-
-    ctx.fillStyle = "#0a0a0a"
-    ctx.fillRect(0, 0, width, height)
-
-    // Draw grid
-    ctx.strokeStyle = "#27272a"
-    ctx.lineWidth = 1
-    for (let i = 0; i <= 5; i++) {
-      const y = (i * height) / 5
-      ctx.beginPath()
-      ctx.moveTo(0, y)
-      ctx.lineTo(width, y)
-      ctx.stroke()
-    }
-
-    if (data.length < 2) return
-
-    // Draw control latency
-    ctx.strokeStyle = "#f59e0b"
-    ctx.lineWidth = 2
-    ctx.beginPath()
-
-    data.forEach((point, i) => {
-      const x = (i / Math.max(data.length - 1, 1)) * width
-      const normalized = (point.controlLatency - 10) / 140 // Map 10-150ms to 0-1
-      const y = height - normalized * height
-
-      if (i === 0) {
-        ctx.moveTo(x, y)
-      } else {
-        ctx.lineTo(x, y)
-      }
-    })
-    ctx.stroke()
-
-    // Draw labels
-    ctx.fillStyle = "#a1a1aa"
-    ctx.font = "12px monospace"
-    ctx.fillText("10 ms", 5, height - 5)
-    ctx.fillText("150 ms", 5, 15)
-    ctx.fillText("Control Latency", width / 2 - 50, 15)
-  }
-
-  // Animation loop
-  useEffect(() => {
-    if (!isPlaying) {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current)
-      }
+  const handleUpload = async () => {
+    if (!selectedFile) {
+      toast({
+        title: "No file selected",
+        description: "Please select an audio file first",
+        variant: "destructive",
+      })
       return
     }
 
-    const animate = () => {
-      timeRef.current += 0.05
-      const newSignal = generateSignal(timeRef.current)
+    setIsUploading(true)
+    setPredictionResult(null)
 
-      setSignalData((prev) => {
-        const updated = [...prev, newSignal]
-        return updated.slice(-200) // Keep last 200 points
+    try {
+      const formData = new FormData()
+      formData.append("audio", selectedFile)
+
+      console.log("[v0] Uploading file to prediction API:", selectedFile.name)
+
+      const response = await fetch("http://127.0.0.1:5000/predict", {
+        method: "POST",
+        body: formData,
       })
+      console.log("[v0] Response:", response)
 
-      animationRef.current = requestAnimationFrame(animate)
-    }
+      console.log("[v0] Response status:", response.status)
 
-    animate()
-
-    return () => {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current)
+      if (!response.ok) {
+        throw new Error(`Server responded with status: ${response.status}`)
       }
-    }
-  }, [isPlaying, droneId])
 
-  // Draw plots
-  useEffect(() => {
-    if (canvasRef.current) {
-      drawSignalPlot(canvasRef.current, signalData)
-    }
-    if (gpsCanvasRef.current) {
-      drawGPSPlot(gpsCanvasRef.current, signalData)
-    }
-    if (latencyCanvasRef.current) {
-      drawLatencyPlot(latencyCanvasRef.current, signalData)
-    }
-  }, [signalData])
+      const result: PredictionResult = await response.json()
+      console.log("[v0] Prediction result:", result)
 
-  const handleReset = () => {
-    setIsPlaying(false)
-    setSignalData([])
-    timeRef.current = 0
+      setPredictionResult(result)
+
+      toast({
+        title: "Analysis complete",
+        description: `Drone classified as: ${result.classification}`,
+      })
+    } catch (error) {
+      console.error("[v0] Error uploading file:", error)
+      toast({
+        title: "Upload failed",
+        description: error instanceof Error ? error.message : "Failed to analyze audio file",
+        variant: "destructive",
+      })
+    } finally {
+      setIsUploading(false)
+    }
   }
 
-  // Get current stats
-  const currentSignal = signalData[signalData.length - 1]
+  const handleReset = () => {
+    setSelectedFile(null)
+    setPredictionResult(null)
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ""
+    }
+  }
 
   return (
     <div className="space-y-4">
-      {/* Control Panel */}
+      {/* Upload Panel */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Plane className="h-5 w-5 text-secondary" />
-            Drone Telemetry Monitor
+            Drone Audio Classification
           </CardTitle>
-          <CardDescription>Real-time signal analysis for UAV communication systems</CardDescription>
+          <CardDescription>Upload drone audio for AI-powered classification and analysis</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="space-y-4">
+            {/* File Upload */}
             <div className="space-y-2">
-              <Label htmlFor="drone-select">Drone Unit</Label>
-              <Select value={droneId} onValueChange={setDroneId}>
-                <SelectTrigger id="drone-select">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {DRONES.map((drone) => (
-                    <SelectItem key={drone.id} value={drone.id}>
-                      {drone.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Controls</Label>
+              <Label htmlFor="audio-file">Audio File</Label>
               <div className="flex gap-2">
-                <Button
-                  onClick={() => setIsPlaying(!isPlaying)}
-                  variant={isPlaying ? "destructive" : "default"}
+                <Input
+                  id="audio-file"
+                  ref={fileInputRef}
+                  type="file"
+                  accept="audio/*"
+                  onChange={handleFileSelect}
+                  disabled={isUploading}
                   className="flex-1"
-                >
-                  {isPlaying ? (
-                    <>
-                      <Pause className="h-4 w-4 mr-2" />
-                      Pause
-                    </>
-                  ) : (
-                    <>
-                      <Play className="h-4 w-4 mr-2" />
-                      Start
-                    </>
-                  )}
-                </Button>
-                <Button onClick={handleReset} variant="outline">
-                  <RotateCcw className="h-4 w-4" />
+                />
+                <Button onClick={handleReset} variant="outline" disabled={isUploading || !selectedFile}>
+                  Reset
                 </Button>
               </div>
+              {selectedFile && (
+                <p className="text-sm text-muted-foreground">
+                  Selected: {selectedFile.name} ({(selectedFile.size / 1024).toFixed(2)} KB)
+                </p>
+              )}
             </div>
 
-            <div className="space-y-2">
-              <Label>Current Status</Label>
-              <div className="text-sm space-y-1">
-                {currentSignal ? (
-                  <>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Signal:</span>
-                      <span className="font-mono">{currentSignal.signalStrength.toFixed(1)} dBm</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">GPS:</span>
-                      <span className="font-mono">{currentSignal.gpsQuality.toFixed(0)}%</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Latency:</span>
-                      <span className="font-mono">{currentSignal.controlLatency.toFixed(0)} ms</span>
-                    </div>
-                  </>
-                ) : (
-                  <div className="text-muted-foreground">No data</div>
-                )}
-              </div>
-            </div>
+            {/* Upload Button */}
+            <Button onClick={handleUpload} disabled={!selectedFile || isUploading} className="w-full" size="lg">
+              {isUploading ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Analyzing...
+                </>
+              ) : (
+                <>
+                  <Upload className="h-4 w-4 mr-2" />
+                  Upload & Analyze
+                </>
+              )}
+            </Button>
           </div>
         </CardContent>
       </Card>
 
-      {/* Visualization Area */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Signal Strength */}
+      {/* Results Panel */}
+      {predictionResult && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">RF Signal Strength</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              {predictionResult.status === "success" ? (
+                <CheckCircle2 className="h-5 w-5 text-chart-3" />
+              ) : (
+                <XCircle className="h-5 w-5 text-destructive" />
+              )}
+              Analysis Results
+            </CardTitle>
+            <CardDescription>AI classification results for the uploaded audio</CardDescription>
           </CardHeader>
           <CardContent>
-            <canvas ref={canvasRef} width={600} height={300} className="w-full h-auto border border-border rounded" />
+            <div className="space-y-4">
+              {/* Classification */}
+              <div className="p-4 rounded-lg bg-muted">
+                <Label className="text-sm text-muted-foreground">Classification</Label>
+                <p className="text-2xl font-bold text-foreground mt-1">{predictionResult.classification}</p>
+              </div>
+
+              {/* Confidence */}
+              <div className="p-4 rounded-lg bg-muted">
+                <Label className="text-sm text-muted-foreground">Confidence</Label>
+                <div className="flex items-end gap-2 mt-1">
+                  <p className="text-2xl font-bold text-foreground">
+                    {(predictionResult.confidence * 100).toFixed(2)}%
+                  </p>
+                  <div className="flex-1 h-4 bg-background rounded-full overflow-hidden mb-1">
+                    <div
+                      className="h-full bg-chart-1 transition-all duration-500"
+                      style={{ width: `${predictionResult.confidence * 100}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Status */}
+              <div className="p-4 rounded-lg bg-muted">
+                <Label className="text-sm text-muted-foreground">Status</Label>
+                <div className="flex items-center gap-2 mt-1">
+                  {predictionResult.status === "success" ? (
+                    <CheckCircle2 className="h-5 w-5 text-chart-3" />
+                  ) : (
+                    <XCircle className="h-5 w-5 text-destructive" />
+                  )}
+                  <p className="text-xl font-semibold text-foreground capitalize">{predictionResult.status}</p>
+                </div>
+              </div>
+            </div>
           </CardContent>
         </Card>
+      )}
 
-        {/* GPS Quality */}
+      {/* Info Card */}
+      {!predictionResult && !selectedFile && (
         <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">GPS Signal Quality</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <canvas
-              ref={gpsCanvasRef}
-              width={600}
-              height={300}
-              className="w-full h-auto border border-border rounded"
-            />
+          <CardContent className="pt-6">
+            <div className="flex flex-col items-center justify-center py-8 text-center">
+              <Plane className="h-16 w-16 text-muted-foreground mb-4" />
+              <h3 className="text-lg font-semibold text-foreground mb-2">Upload Drone Audio</h3>
+              <p className="text-sm text-muted-foreground max-w-md">
+                Select an audio file containing drone sounds to classify the drone type using AI-powered analysis. The
+                system will return the classification, confidence level, and processing status.
+              </p>
+            </div>
           </CardContent>
         </Card>
-
-        {/* Control Latency */}
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle className="text-lg">Control Signal Latency</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <canvas
-              ref={latencyCanvasRef}
-              width={1200}
-              height={300}
-              className="w-full h-auto border border-border rounded"
-            />
-          </CardContent>
-        </Card>
-      </div>
+      )}
     </div>
   )
 }
