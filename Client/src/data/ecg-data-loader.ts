@@ -18,8 +18,8 @@ export interface ECGRecording {
  */
 export function getAvailablePatients(): string[] {
   const patients: string[] = []
-  // Patient folders increment by 1000: 00000, 01000, 02000, ..., 21000
-  for (let i = 0; i <= 21000; i += 1000) {
+  // Patient folders increment by 1000: 00000, 01000, 02000, ..., 10000
+  for (let i = 0; i <= 0; i += 1000) {
     patients.push(i.toString().padStart(5, "0"))
   }
   return patients

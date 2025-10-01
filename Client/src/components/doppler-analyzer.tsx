@@ -2,11 +2,11 @@
 
 import type React from "react"
 import { useState, useRef, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
-import { Card } from "@/components/ui/card"
+import { Button } from "../components/ui/button"
+import { Label } from "../components/ui/label"
+import { Card } from "../components/ui/card"
 import { Upload, Volume2 } from "lucide-react"
-import { useToast } from "@/hooks/use-toast"
+import { useToast } from "../hooks/use-toast"
 
 export default function DopplerAnalyzer() {
   const [audioFile, setAudioFile] = useState<File | null>(null)
