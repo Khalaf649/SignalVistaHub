@@ -1,21 +1,28 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import type { ECGRecording } from "../data/ecg-data-loader"
 import { PolarPlot } from "./plots/polar-signal-plot"
 
-interface PolarECGPlotProps {
+type EEGRecording = {
+  id: string
+  samplingRate: number
+  duration: number
+  leads: string[]
+  signals: number[][]
+}
+
+interface PolarEEGPlotProps {
   channel: number
   isPlaying: boolean
   channelName: string
-  recording: ECGRecording | null
+  recording: EEGRecording | null
 }
 
-export default function PolarECGPlot({ channel, isPlaying, channelName, recording }: PolarECGPlotProps) {
+export default function PolarEEGPlot({ channel, isPlaying, channelName, recording }: PolarEEGPlotProps) {
   const [dataBuffer, setDataBuffer] = useState<number[]>([])
   const animationRef = useRef<number>(0)
   const dataPointerRef = useRef(0)
-  const samplesPerCycle = 1000 // 2 seconds at 500 Hz = one complete 360° rotation
+  const samplesPerCycle = recording ? recording.samplingRate / 2 : 1000 // Half second cycle
   const stepSize = 20 // Add samples in smaller chunks for smooth animation
 
   const getNextSamples = (): number[] => {
@@ -23,13 +30,16 @@ export default function PolarECGPlot({ channel, isPlaying, channelName, recordin
       return []
     }
 
+    const channelData = recording.signals[channel] || []
+    const maxSamples = Math.min(5000, channelData.length)
+
     const samples: number[] = []
     for (let i = 0; i < stepSize; i++) {
       const idx = dataPointerRef.current + i
-      if (idx >= recording.signals.length) {
+      if (idx >= maxSamples) {
         break
       }
-      samples.push(recording.signals[idx][channel])
+      samples.push(channelData[idx])
     }
 
     dataPointerRef.current += samples.length
@@ -77,13 +87,13 @@ export default function PolarECGPlot({ channel, isPlaying, channelName, recordin
         width={600}
         height={300}
         className="w-full border border-border rounded-md"
-        minValue={-2}
-        maxValue={2}
-        autoNormalize={false} // Use explicit for consistent ECG scaling
+        minValue={-600}
+        maxValue={600}
+        autoNormalize={true} // Use auto normalization for EEG to handle varying amplitudes
       />
       <div className="mt-2 text-sm text-muted-foreground text-center">
-        Polar Representation (R-θ) | Radius = Amplitude | Cycle: 2 seconds ({samplesPerCycle} samples) | Total:{" "}
-        {dataBuffer.length} samples
+        Polar Representation (R-θ) | Radius = Amplitude | Cycle: 0.5 seconds ({samplesPerCycle} samples) | Total:{" "}
+        {dataBuffer.length} samples (max 5000)
       </div>
     </div>
   )

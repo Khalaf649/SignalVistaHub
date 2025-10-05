@@ -6,12 +6,14 @@ import { Label } from "./ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
 import { Input } from "./ui/input"
 import { Button } from "./ui/button"
-import { Activity, Play, Pause, RotateCcw, AlertCircle } from "lucide-react"
+import { Activity, Play, Pause, RotateCcw, AlertCircle, Brain, CheckCircle2 } from "lucide-react"
+import { predictECG, DISEASE_NAMES, type ECGPredictionResponse } from "../lib/ecg"
+import { useToast } from "../hooks/use-toast"
+
 const LinearECGPlot = lazy(() => import("./ecg-linear-plot"))
 const PolarECGPlot = lazy(() => import("./ecg-polar-plot"))
 const RecurrencePlot = lazy(() => import("./ecg-recurrence-plot"))
 import { getAvailablePatients, loadECGRecording, type ECGRecording } from "../data/ecg-data-loader"
-
 
 export default function ECGMonitor() {
   const [availablePatients, setAvailablePatients] = useState<string[]>([])
@@ -25,15 +27,17 @@ export default function ECGMonitor() {
   const [isPlaying, setIsPlaying] = useState(false)
   const [plotMode, setPlotMode] = useState<"linear" | "polar">("linear")
 
+  const [predicting, setPredicting] = useState(false)
+  const [prediction, setPrediction] = useState<ECGPredictionResponse | null>(null)
+  const { toast } = useToast()
+
   useEffect(() => {
     console.log("rendering ......")
     const patients = getAvailablePatients()
-  
-    
+
     setAvailablePatients(patients)
     if (patients.length > 0) {
       setSelectedPatient(patients[0])
-    
     }
     console.log("Available patients:", patients)
   }, [])
@@ -52,6 +56,7 @@ export default function ECGMonitor() {
 
     setLoading(true)
     setError(null)
+    setPrediction(null)
 
     try {
       const recording = await loadECGRecording(selectedPatient, recordingId)
@@ -69,6 +74,41 @@ export default function ECGMonitor() {
       console.error("[v0] Load error:", err)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handlePredict = async () => {
+    if (!selectedPatient || !recordingId) {
+      toast({
+        title: "Error",
+        description: "Please load a recording first",
+        variant: "destructive",
+      })
+      return
+    }
+
+    setPredicting(true)
+    setPrediction(null)
+
+    try {
+      // Format: /{patientFolder}/{Record_id}
+      const jsonPath = `${selectedPatient}/${recordingId.padStart(5, "0").concat("_hr.json")}`
+      const result = await predictECG(jsonPath)
+
+      setPrediction(result)
+      toast({
+        title: "Prediction Complete",
+        description: "ECG analysis has been completed successfully",
+      })
+    } catch (err) {
+      console.error("[v0] Prediction error:", err)
+      toast({
+        title: "Prediction Failed",
+        description: err instanceof Error ? err.message : "Failed to analyze ECG",
+        variant: "destructive",
+      })
+    } finally {
+      setPredicting(false)
     }
   }
 
@@ -269,6 +309,94 @@ export default function ECGMonitor() {
         </CardContent>
       </Card>
 
+      {currentRecording && (
+        <Card className="border-secondary/20">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Brain className="h-5 w-5 text-secondary" />
+              AI-Powered ECG Analysis
+            </CardTitle>
+            <CardDescription>Detect cardiac abnormalities using machine learning</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <Button onClick={handlePredict} disabled={predicting} className="w-full md:w-auto">
+                <Brain className="h-4 w-4 mr-2" />
+                {predicting ? "Analyzing..." : "Analyze ECG"}
+              </Button>
+
+              {prediction && prediction.status === "success" && (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {Object.entries(prediction.data.probabilities).map(([key, probability]) => {
+                      const isPredicted =
+                        prediction.data.predictions[key as keyof typeof prediction.data.predictions] === 1
+                      const percentage = (probability * 100).toFixed(2)
+
+                      return (
+                        <Card key={key} className={isPredicted ? "border-destructive/50 bg-destructive/5" : ""}>
+                          <CardHeader className="pb-3">
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1">
+                                <CardTitle className="text-sm font-medium">{DISEASE_NAMES[key]}</CardTitle>
+                                <p className="text-xs text-muted-foreground mt-1">{key}</p>
+                              </div>
+                              {isPredicted ? (
+                                <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium bg-destructive text-destructive-foreground ml-2">
+                                  <AlertCircle className="h-3 w-3" />
+                                  Detected
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium border border-border bg-background ml-2">
+                                  <CheckCircle2 className="h-3 w-3" />
+                                  Normal
+                                </span>
+                              )}
+                            </div>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="space-y-2">
+                              <div className="flex justify-between text-sm">
+                                <span className="text-muted-foreground">Probability</span>
+                                <span className="font-medium">{percentage}%</span>
+                              </div>
+                              <div className="h-2 w-full bg-secondary/20 rounded-full overflow-hidden">
+                                <div
+                                  className="h-full bg-secondary transition-all duration-500 ease-out rounded-full"
+                                  style={{ width: `${probability * 100}%` }}
+                                />
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      )
+                    })}
+                  </div>
+
+                  {prediction.data.summary && prediction.data.summary.length > 0 && (
+                    <Card className="bg-muted/50">
+                      <CardHeader>
+                        <CardTitle className="text-sm">Summary</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <ul className="space-y-1 text-sm">
+                          {prediction.data.summary.map((item, idx) => (
+                            <li key={idx} className="flex items-start gap-2">
+                              <span className="text-muted-foreground">•</span>
+                              <span>{item}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </CardContent>
+                    </Card>
+                  )}
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Visualization Area */}
       {currentRecording && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -286,6 +414,7 @@ export default function ECGMonitor() {
                   isPlaying={isPlaying}
                   channelName={availableLeads[primaryChannel]}
                   recording={currentRecording}
+                  
                 />
               ) : (
                 <PolarECGPlot

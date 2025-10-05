@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { useState, useRef, useEffect } from "react"
-import { Button } from "../components/ui/button"
+import { Button } from "./ui/button"
 import { Label } from "../components/ui/label"
 import { Card } from "../components/ui/card"
 import { Upload, Volume2 } from "lucide-react"
