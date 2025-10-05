@@ -1,8 +1,7 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import PolarSignalPlot from "./plots/polar-signal-plot-ecg"
 import type { ECGRecording } from "../data/ecg-data-loader"
-import { PolarPlot } from "./plots/polar-signal-plot"
 
 interface PolarECGPlotProps {
   channel: number
@@ -12,79 +11,19 @@ interface PolarECGPlotProps {
 }
 
 export default function PolarECGPlot({ channel, isPlaying, channelName, recording }: PolarECGPlotProps) {
-  const [dataBuffer, setDataBuffer] = useState<number[]>([])
-  const animationRef = useRef<number>(0)
-  const dataPointerRef = useRef(0)
-  const samplesPerCycle = 1000 // 2 seconds at 500 Hz = one complete 360° rotation
-  const stepSize = 20 // Add samples in smaller chunks for smooth animation
-
-  const getNextSamples = (): number[] => {
-    if (!recording || !recording.signals || recording.signals.length === 0) {
-      return []
-    }
-
-    const samples: number[] = []
-    for (let i = 0; i < stepSize; i++) {
-      const idx = dataPointerRef.current + i
-      if (idx >= recording.signals.length) {
-        break
-      }
-      samples.push(recording.signals[idx][channel])
-    }
-
-    dataPointerRef.current += samples.length
-    return samples
+  if (!recording || !recording.signals || recording.signals.length === 0) {
+    return <div className="text-muted-foreground">No recording data available</div>
   }
 
-  useEffect(() => {
-    const animate = () => {
-      if (!isPlaying) return
-
-      const newSamples = getNextSamples()
-
-      if (newSamples.length === 0) {
-        return
-      }
-
-      setDataBuffer((prev) => {
-        return [...prev, ...newSamples]
-      })
-
-      animationRef.current = requestAnimationFrame(animate)
-    }
-
-    if (isPlaying) {
-      animationRef.current = requestAnimationFrame(animate)
-    }
-
-    return () => {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current)
-      }
-    }
-  }, [isPlaying, channel, recording])
-
-  useEffect(() => {
-    setDataBuffer([])
-    dataPointerRef.current = 0
-  }, [channel, recording])
+  // Extract channel data from 2D array
+  const channelData = recording.signals.map((sample) => sample[channel])
 
   return (
-    <div className="w-full">
-      <PolarPlot
-        data={dataBuffer}
-        samplesPerCycle={samplesPerCycle}
-        width={600}
-        height={300}
-        className="w-full border border-border rounded-md"
-        minValue={-2}
-        maxValue={2}
-        autoNormalize={false} // Use explicit for consistent ECG scaling
-      />
-      <div className="mt-2 text-sm text-muted-foreground text-center">
-        Polar Representation (R-θ) | Radius = Amplitude | Cycle: 2 seconds ({samplesPerCycle} samples) | Total:{" "}
-        {dataBuffer.length} samples
-      </div>
-    </div>
+    <PolarSignalPlot
+      data={channelData}
+      samplingRate={recording.samplingRate}
+      isPlaying={isPlaying}
+      channelName={channelName}
+    />
   )
 }

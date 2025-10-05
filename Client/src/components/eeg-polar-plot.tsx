@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { PolarPlot } from "./plots/polar-signal-plot"
+import { PolarPlot } from "./plots/polar-signal-plot-eeg"
 
 type EEGRecording = {
   id: string
@@ -84,12 +84,7 @@ export default function PolarEEGPlot({ channel, isPlaying, channelName, recordin
       <PolarPlot
         data={dataBuffer}
         samplesPerCycle={samplesPerCycle}
-        width={600}
-        height={300}
         className="w-full border border-border rounded-md"
-        minValue={-600}
-        maxValue={600}
-        autoNormalize={true} // Use auto normalization for EEG to handle varying amplitudes
       />
       <div className="mt-2 text-sm text-muted-foreground text-center">
         Polar Representation (R-θ) | Radius = Amplitude | Cycle: 0.5 seconds ({samplesPerCycle} samples) | Total:{" "}

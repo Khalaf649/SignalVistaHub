@@ -13,6 +13,7 @@ import { useToast } from "../hooks/use-toast"
 const LinearECGPlot = lazy(() => import("./ecg-linear-plot"))
 const PolarECGPlot = lazy(() => import("./ecg-polar-plot"))
 const RecurrencePlot = lazy(() => import("./ecg-recurrence-plot"))
+const XorECGPlot = lazy(() => import("./ecg-xor-plot"))
 import { getAvailablePatients, loadECGRecording, type ECGRecording } from "../data/ecg-data-loader"
 
 export default function ECGMonitor() {
@@ -443,6 +444,69 @@ export default function ECGMonitor() {
                 channel2Name={availableLeads[secondaryChannel]}
                 recording={currentRecording}
               />
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* XOR Graph Monitor Section */}
+      {currentRecording && (
+        <div className="grid grid-cols-1 gap-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">XOR Graph Monitor</CardTitle>
+              <CardDescription>Comparison of primary and secondary channels when the absoluteDifference is 0.1mV</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                {/* Primary Channel Linear Plot */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-sm">Primary Channel</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <LinearECGPlot
+                      channel={primaryChannel}
+                      isPlaying={isPlaying}
+                      channelName={availableLeads[primaryChannel]}
+                      recording={currentRecording}
+                    />
+                  </CardContent>
+                </Card>
+
+                {/* Secondary Channel Linear Plot */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-sm">Secondary Channel</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <LinearECGPlot
+                      channel={secondaryChannel}
+                      isPlaying={isPlaying}
+                      channelName={availableLeads[secondaryChannel]}
+                      recording={currentRecording}
+                    />
+                  </CardContent>
+                </Card>
+
+                {/* XOR Comparison Plot */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-sm">XOR Comparison</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <XorECGPlot
+                      channel1={primaryChannel}
+                      channel2={secondaryChannel}
+                      isPlaying={isPlaying}
+                      channel1Name={availableLeads[primaryChannel]}
+                      channel2Name={availableLeads[secondaryChannel]}
+                      recording={currentRecording}
+                      threshold={0.1}
+                    />
+                  </CardContent>
+                </Card>
+              </div>
             </CardContent>
           </Card>
         </div>

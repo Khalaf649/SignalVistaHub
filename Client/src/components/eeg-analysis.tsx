@@ -13,6 +13,7 @@ import { preprocessEDF, fetchEEGData } from "../lib/eeg"
 
 const LinearEEGPlot = lazy(() => import("./eeg-linear-plot"))
 const PolarEEGPlot = lazy(() => import("./eeg-polar-plot"))
+const EEGRecurrencePlot = lazy(() => import("./eeg-recurrence-plot"))
 
 type EEGRecording = {
   id: string
@@ -27,7 +28,8 @@ export default function EEGAnalysis() {
   const [loading, setLoading] = useState(false)
   const [loadingMessage, setLoadingMessage] = useState("")
   const [error, setError] = useState<string | null>(null)
-  const [selectedChannel, setSelectedChannel] = useState(0)
+  const [primaryChannel, setPrimaryChannel] = useState(0)
+  const [secondaryChannel, setSecondaryChannel] = useState(1)
   const [isPlaying, setIsPlaying] = useState(false)
   const [plotMode, setPlotMode] = useState<"linear" | "polar">("linear")
 
@@ -44,20 +46,17 @@ export default function EEGAnalysis() {
     setError(null)
 
     try {
-      // Step 1: Preprocess the EDF file
       setLoadingMessage("Preprocessing EDF file...")
       const preprocessResponse = await preprocessEDF(file)
 
       console.log("[v0] Preprocess response:", preprocessResponse)
 
-      // Step 2: Fetch the actual data from the access URL (this is the 200MB file)
       setLoadingMessage("Fetching EEG data (this may take a moment for large files)...")
       const eegData = await fetchEEGData(preprocessResponse.access_url)
 
       console.log("[v0] EEG data loaded, channels:", eegData.channels.length)
 
-      // Calculate sampling rate and duration from the data if not provided
-      const samplingRate = eegData.samplingRate || 256 // Default to 256 Hz if not provided
+      const samplingRate = eegData.samplingRate || 256
       const duration = eegData.duration || (eegData.data[0]?.length || 0) / samplingRate
 
       const recording: EEGRecording = {
@@ -69,7 +68,8 @@ export default function EEGAnalysis() {
       }
 
       setCurrentRecording(recording)
-      setSelectedChannel(0)
+      setPrimaryChannel(0)
+      setSecondaryChannel(Math.min(1, recording.leads.length - 1))
       setIsPlaying(false)
       setError(null)
       setLoadingMessage("")
@@ -95,7 +95,6 @@ export default function EEGAnalysis() {
         <p className="text-muted-foreground">Electroencephalography signal processing and analysis</p>
       </div>
 
-      {/* Control Panel */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -107,7 +106,7 @@ export default function EEGAnalysis() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="space-y-2">
               <Label htmlFor="edf-upload">Upload EDF File</Label>
               <div className="flex gap-2">
@@ -126,13 +125,33 @@ export default function EEGAnalysis() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="channel-select">Channel</Label>
+              <Label htmlFor="primary-channel">Primary Channel</Label>
               <Select
-                value={selectedChannel.toString()}
-                onValueChange={(v) => setSelectedChannel(Number.parseInt(v))}
+                value={primaryChannel.toString()}
+                onValueChange={(v) => setPrimaryChannel(Number.parseInt(v))}
                 disabled={!currentRecording}
               >
-                <SelectTrigger id="channel-select">
+                <SelectTrigger id="primary-channel">
+                  <SelectValue placeholder="Select channel" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableLeads.map((channel, idx) => (
+                    <SelectItem key={idx} value={idx.toString()}>
+                      {channel}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="secondary-channel">Secondary Channel</Label>
+              <Select
+                value={secondaryChannel.toString()}
+                onValueChange={(v) => setSecondaryChannel(Number.parseInt(v))}
+                disabled={!currentRecording}
+              >
+                <SelectTrigger id="secondary-channel">
                   <SelectValue placeholder="Select channel" />
                 </SelectTrigger>
                 <SelectContent>
@@ -206,38 +225,66 @@ export default function EEGAnalysis() {
       </Card>
 
       {currentRecording && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">
-              {availableLeads[selectedChannel]} - {plotMode === "linear" ? "Linear" : "Polar"} View
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Suspense
-              fallback={
-                <div className="flex items-center justify-center h-96">
-                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                </div>
-              }
-            >
-              {plotMode === "linear" ? (
-                <LinearEEGPlot
-                  channel={selectedChannel}
-                  isPlaying={isPlaying}
-                  channelName={availableLeads[selectedChannel]}
+        <div className="grid grid-cols-1 gap-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">
+                Recurrence: {availableLeads[primaryChannel]} vs {availableLeads[secondaryChannel]}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Suspense
+                fallback={
+                  <div className="flex items-center justify-center h-96">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  </div>
+                }
+              >
+                <EEGRecurrencePlot
+                  channel1={primaryChannel}
+                  channel2={secondaryChannel}
+                  channel1Name={availableLeads[primaryChannel]}
+                  channel2Name={availableLeads[secondaryChannel]}
                   recording={currentRecording}
-                />
-              ) : (
-                <PolarEEGPlot
-                  channel={selectedChannel}
                   isPlaying={isPlaying}
-                  channelName={availableLeads[selectedChannel]}
-                  recording={currentRecording}
                 />
-              )}
-            </Suspense>
-          </CardContent>
-        </Card>
+              </Suspense>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">
+                {availableLeads[primaryChannel]} - {plotMode === "linear" ? "Linear" : "Polar"} View
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Suspense
+                fallback={
+                  <div className="flex items-center justify-center h-96">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  </div>
+                }
+              >
+                {plotMode === "linear" ? (
+                  <LinearEEGPlot
+                    channel={primaryChannel}
+                    isPlaying={isPlaying}
+                    channelName={availableLeads[primaryChannel]}
+                    recording={currentRecording}
+                  />
+                ) : (
+                  <PolarEEGPlot
+                    channel={primaryChannel}
+                    isPlaying={isPlaying}
+                    channelName={availableLeads[primaryChannel]}
+                    recording={currentRecording}
+                  />
+                )}
+              </Suspense>
+            </CardContent>
+          </Card>
+        </div>
       )}
     </div>
   )

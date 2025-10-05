@@ -188,10 +188,6 @@ export default function LinearSignalPlot({
   return (
     <div className="w-full h-80 bg-white rounded-lg border border-gray-200 p-4">
       <Line options={chartOptions} data={chartData} />
-      <div className="mt-2 text-sm text-gray-500 text-center">
-        Time Window: {Math.round(currentStartTime * 10) / 10}s - {Math.round(currentEndTime * 10) / 10}s ({dataBuffer.length} samples) |
-        Sampling Rate: {samplingRate} Hz | Channel: {channelName}
-      </div>
       <div className="mt-2 flex justify-between items-center text-xs">
         <div className="flex items-center space-x-2">
           <label>Speed:</label>

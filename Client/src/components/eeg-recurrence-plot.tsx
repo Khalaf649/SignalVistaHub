@@ -1,30 +1,37 @@
 "use client"
 
 import RecurrencePlot from "./plots/recurrence-plot"
-import type { ECGRecording } from "../data/ecg-data-loader"
 
-interface ECGRecurrencePlotProps {
+type EEGRecording = {
+  id: string
+  samplingRate: number
+  duration: number
+  leads: string[]
+  signals: number[][]
+}
+
+interface EEGRecurrencePlotProps {
   channel1: number
   channel2: number
   channel1Name: string
   channel2Name: string
-  recording: ECGRecording | null
+  recording: EEGRecording | null
   isPlaying: boolean
 }
 
-export default function ECGRecurrencePlot({
+export default function EEGRecurrencePlot({
   channel1,
   channel2,
   channel1Name,
   channel2Name,
   recording,
-}: ECGRecurrencePlotProps) {
+}: EEGRecurrencePlotProps) {
   if (!recording) {
     return <div className="flex items-center justify-center h-96 text-muted-foreground">No recording loaded</div>
   }
 
-  const channel1Data = recording.signals.map((sample) => sample[channel1])
-  const channel2Data = recording.signals.map((sample) => sample[channel2])
+  const channel1Data = recording.signals[channel1] || []
+  const channel2Data = recording.signals[channel2] || []
 
   return (
     <RecurrencePlot
