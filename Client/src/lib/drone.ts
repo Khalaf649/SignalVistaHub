@@ -4,7 +4,7 @@ export interface DronePredictionResult {
   status: string
 }
 
-const BASE_URL = "http://127.0.0.1:8000/api"
+
 
 /**
  * Upload audio file for drone classification
@@ -13,10 +13,11 @@ export async function predictDrone(audioFile: File): Promise<DronePredictionResu
   const formData = new FormData()
   formData.append("audio", audioFile)
 
-  const response = await fetch(`${BASE_URL}/predictDrone`, {
+  const response = await fetch(`http://127.0.0.1:8000/api/predictDrone`, {
     method: "POST",
     body: formData,
   })
+  console.log(response)
 
 
   if (!response.ok) {

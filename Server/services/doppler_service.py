@@ -1,6 +1,8 @@
 import numpy as np
 from scipy.io.wavfile import write
 import io
+import h5py
+import os
 
 def simulate_doppler(frequency: float, velocity: float, duration: float, fs: int = 8000):
     """
@@ -57,3 +59,28 @@ def simulate_doppler(frequency: float, velocity: float, duration: float, fs: int
         "min_frequency": min_freq,
         "shift_ratio": shift_ratio
     }
+
+MODEL_PATH = "speed_estimations_NN_1000-200-50-10-1_reg1e-3_lossMSE.h5"  # Hardcoded model path
+def get_first_predicted_speed(audio_path: str):
+    """
+    Extracts the first predicted speed for the given uploaded audio file.
+    The .h5 model path is hardcoded.
+    """
+    filename = os.path.basename(audio_path)
+    vehicle_name, true_speed_str = filename.replace(".wav", "").split("_")
+    true_speed = float(true_speed_str)
+
+    est_key = f"{vehicle_name}_speeds_est_all"
+    gt_key = f"{vehicle_name}_speeds_gt"
+
+    with h5py.File(MODEL_PATH, "r") as f:
+        if est_key not in f or gt_key not in f:
+            raise KeyError(f"Vehicle '{vehicle_name}' not found in HDF5 file.")
+
+        gt_speeds = f[gt_key][()]        # shape: (N,)
+        est_speeds = f[est_key][()]      # shape: (20, N)
+
+        idx = np.argmin(np.abs(gt_speeds - true_speed))
+        first_pred_speed = est_speeds[0, idx]
+
+    return float(first_pred_speed)

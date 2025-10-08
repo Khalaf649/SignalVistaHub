@@ -17,7 +17,7 @@ def load_json_file(json_path: str) -> np.ndarray:
         raise ValueError(f"Expected signals shape (5000, 12), got {signals.shape}")
     return signals
 
-def prepare_input(ecg_data: np.ndarray, scale_factor: float = 0.01, normalize: bool = False) -> np.ndarray:
+def prepare_input(ecg_data: np.ndarray, scale_factor: float = 0.01, normalize: bool = True) -> np.ndarray:
     """Resample to 400 Hz (pad to 4096), scale (default /100 for μV to model units), optional z-norm per lead, add batch dim."""
     # Ensure float32 early
     ecg_data = ecg_data.astype(np.float32)
@@ -51,7 +51,7 @@ def run_inference(input_data: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
         print(f"Failed to load or run fresh model: {e}")
         raise RuntimeError(f"Model inference failed: {e}")
 
-def predict_ecg(json_path: str, scale_factor: float = 0.01, normalize: bool = False) -> Dict[str, Any]:
+def predict_ecg(json_path: str, scale_factor: float = 0.01, normalize: bool = True) -> Dict[str, Any]:
     """Full pipeline: load → prep → predict (model loaded in run_inference)."""
     ecg_data = load_json_file(json_path)
     input_data = prepare_input(ecg_data, scale_factor, normalize)

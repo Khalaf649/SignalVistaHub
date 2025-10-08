@@ -59,7 +59,7 @@ export default function DroneTelemetry() {
 
       console.log("[v0] Uploading file to prediction API:", selectedFile.name)
 
-      const response = await fetch("http://127.0.0.1:5000/predictDrone", {
+      const response = await fetch("http://127.0.0.1:8000/api/predictDrone", {
         method: "POST",
         body: formData,
       })

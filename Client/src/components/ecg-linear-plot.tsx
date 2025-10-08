@@ -21,7 +21,7 @@ export default function LinearECGPlot({ channel, isPlaying, channelName, recordi
   return (
     <LinearSignalPlot
       data={channelData}
-      samplingRate={recording.samplingRate}
+      samplingRate={500}
       isPlaying={isPlaying}
       channelName={channelName}
       signalType="ECG"

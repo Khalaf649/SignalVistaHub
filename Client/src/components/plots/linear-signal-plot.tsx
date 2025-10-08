@@ -35,7 +35,7 @@ export default function LinearSignalPlot({
   const [dataBuffer, setDataBuffer] = useState<number[]>([])
   const [currentTimeOffset, setCurrentTimeOffset] = useState(0)
   const [speed, setSpeed] = useState(1)
-  const [windowDuration, setWindowDuration] = useState(2)
+  const [windowDuration, setWindowDuration] = useState(1)
   const animationRef = useRef<number>(0)
   const dataPointerRef = useRef(0)
 

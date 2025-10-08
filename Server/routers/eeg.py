@@ -34,6 +34,7 @@ async def preprocess_eeg_endpoint(file: UploadFile = File(..., description="EDF 
             "channels": channels,  # Should be 18
             "access_url": access_url,
             "message": f"Preprocessed data saved. Access at {access_url}"
+            
         }
     
     finally:

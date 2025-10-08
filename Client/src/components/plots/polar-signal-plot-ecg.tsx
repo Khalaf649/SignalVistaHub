@@ -12,7 +12,7 @@ interface PolarSignalPlotProps {
 export default function PolarSignalPlot({ data, samplingRate, isPlaying, channelName }: PolarSignalPlotProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [dataBuffer, setDataBuffer] = useState<number[]>([])
-  const animationRef = useRef<number>()
+  const animationRef = useRef<number>(0)
   const dataPointerRef = useRef(0)
   const samplesPerCycle = 2 * samplingRate // 2 seconds = one complete 360° rotation
   const stepSize = 20

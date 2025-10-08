@@ -56,7 +56,7 @@ export default function EEGAnalysis() {
 
       console.log("[v0] EEG data loaded, channels:", eegData.channels.length)
 
-      const samplingRate = eegData.samplingRate || 256
+      const samplingRate = eegData.samplingRate || 128
       const duration = eegData.duration || (eegData.data[0]?.length || 0) / samplingRate
 
       const recording: EEGRecording = {

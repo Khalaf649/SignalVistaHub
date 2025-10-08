@@ -32,7 +32,7 @@ def preprocess_edf(file_path: str, output_dir: str = "static/eegdata") -> Tuple[
     # Resample to 128 Hz
     raw.resample(128)
     
-    # Get data (assumes 256 Hz; no resample needed)
+   
     data = raw.get_data()*1e6  # Shape: (n_channels, n_times)
     sfreq = raw.info['sfreq']
     

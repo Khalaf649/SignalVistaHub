@@ -26,8 +26,8 @@ export default function DopplerGenerator() {
     plotData && plotData.time && Array.isArray(plotData.time)
       ? plotData.time.map((time, index) => ({
           time: time,
-          frequency: (plotData.frequency || plotData.freq)?.[index] || 0,
-          amplitude: (plotData.amplitude || plotData.amp)?.[index] || 0,
+          frequency: (plotData.frequency)?.[index] || 0,
+          amplitude: (plotData.amplitude)?.[index] || 0,
         }))
       : []
 
