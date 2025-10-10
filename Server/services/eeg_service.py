@@ -46,7 +46,7 @@ def save_preprocessed_to_json(channels: List[str], data: np.ndarray, sfreq: floa
     # Convert numpy to lists for JSON
     json_data = {
         "channels": channels,
-        "sampling_rate": float(sfreq),
+        "samplingRate": float(sfreq),
         "data": data.tolist()  # List of lists: each sublist is a channel's time series
     }
     

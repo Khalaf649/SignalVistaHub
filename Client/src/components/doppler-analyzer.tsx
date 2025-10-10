@@ -1,65 +1,65 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState, useRef } from "react"
-import { Button } from "./ui/button"
-import { Label } from "./ui/label"
-import { Card } from "./ui/card"
-import { Upload, Volume2, Sparkles } from "lucide-react"
-import { useToast } from "../hooks/use-toast"
-import { predictDoppler } from "../lib/doppler"
+import type React from "react";
+import { useState, useRef } from "react";
+import { Button } from "./ui/button";
+import { Label } from "./ui/label";
+import { Card } from "./ui/card";
+import { Upload, Volume2, Sparkles } from "lucide-react";
+import { useToast } from "../hooks/use-toast";
+import { predictDoppler } from "../lib/doppler";
 
 export default function DopplerAnalyzer() {
-  const [audioFile, setAudioFile] = useState<File | null>(null)
-  const [audioUrl, setAudioUrl] = useState<string | null>(null)
-  const [isPredicting, setIsPredicting] = useState(false)
+  const [audioFile, setAudioFile] = useState<File | null>(null);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [isPredicting, setIsPredicting] = useState(false);
   const [predictionResult, setPredictionResult] = useState<{
-    predictedFrequency: number
-    predictedVelocity: number
-  } | null>(null)
-  const fileInputRef = useRef<HTMLInputElement>(null)
-  const { toast } = useToast()
+    predictedFrequency: number;
+    predictedVelocity: number;
+  } | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
+    const file = e.target.files?.[0];
     if (file) {
       if (!file.type.startsWith("audio/")) {
         toast({
           title: "Invalid File",
           description: "Please select an audio file.",
           variant: "destructive",
-        })
-        return
+        });
+        return;
       }
-      setAudioFile(file)
-      setAudioUrl(URL.createObjectURL(file))
-      setPredictionResult(null)
+      setAudioFile(file);
+      setAudioUrl(URL.createObjectURL(file));
+      setPredictionResult(null);
     }
-  }
+  };
 
   const handleAIPrediction = async () => {
-    if (!audioFile) return
+    if (!audioFile) return;
 
-    setIsPredicting(true)
+    setIsPredicting(true);
 
     try {
-      const result = await predictDoppler(audioFile)
-      setPredictionResult(result)
+      const result = await predictDoppler(audioFile);
+      setPredictionResult(result);
       toast({
         title: "AI Prediction Complete",
         description: "Source frequency and velocity have been predicted.",
-      })
+      });
     } catch (error) {
-      console.error("[v0] Error predicting Doppler:", error)
+      console.error("[v0] Error predicting Doppler:", error);
       toast({
         title: "Prediction Failed",
         description: "Failed to predict Doppler parameters. Please try again.",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsPredicting(false)
+      setIsPredicting(false);
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
@@ -78,9 +78,13 @@ export default function DopplerAnalyzer() {
                 onChange={handleFileSelect}
                 className="hidden"
               />
-              <Button onClick={() => fileInputRef.current?.click()} variant="outline" className="flex-1">
+              <Button
+                onClick={() => fileInputRef.current?.click()}
+                variant="outline"
+                className="flex-1"
+              >
                 <Upload className="h-4 w-4 mr-2" />
-                {audioFile ? audioFile.name : "Choose Audio File"}
+                {audioFile ? audioFile.name : " Choose Audio File"}
               </Button>
 
               {audioFile && (
@@ -94,7 +98,9 @@ export default function DopplerAnalyzer() {
                 </Button>
               )}
             </div>
-            <p className="text-xs text-muted-foreground">Upload a WAV, MP3, or other audio file to analyze</p>
+            <p className="text-xs text-muted-foreground">
+              Upload a WAV, MP3, or other audio file to analyze
+            </p>
           </div>
         </div>
       </Card>
@@ -104,18 +110,26 @@ export default function DopplerAnalyzer() {
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-purple-400" />
-              <h3 className="font-semibold text-foreground text-lg">AI Prediction Results</h3>
+              <h3 className="font-semibold text-foreground text-lg">
+                AI Prediction Results
+              </h3>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="bg-background/50 rounded-lg p-4 border border-purple-500/20">
-                <p className="text-sm text-muted-foreground mb-1">Predicted Source Frequency</p>
+                <p className="text-sm text-muted-foreground mb-1">
+                  Predicted Source Frequency
+                </p>
                 <p className="text-2xl font-bold text-purple-400">
                   {predictionResult.predictedFrequency.toFixed(2)} Hz
                 </p>
               </div>
               <div className="bg-background/50 rounded-lg p-4 border border-blue-500/20">
-                <p className="text-sm text-muted-foreground mb-1">Predicted Source Velocity</p>
-                <p className="text-2xl font-bold text-blue-400">{predictionResult.predictedVelocity.toFixed(2)} m/s</p>
+                <p className="text-sm text-muted-foreground mb-1">
+                  Predicted Source Velocity
+                </p>
+                <p className="text-2xl font-bold text-blue-400">
+                  {predictionResult.predictedVelocity.toFixed(2)} m/s
+                </p>
               </div>
             </div>
           </div>
@@ -134,5 +148,5 @@ export default function DopplerAnalyzer() {
         </Card>
       )}
     </div>
-  )
+  );
 }
