@@ -118,20 +118,34 @@ The **server** manages:
 
 ## ⚙️ Installation & Setup
 
+Follow the steps below to set up and run **SignalVistaHub** locally.
+
+---
+
+### 🧾 Prerequisites
+Before starting, make sure the following are installed on your system:
+
+- **Node.js** ≥ 18  
+- **Python** ≥ 3.9  
+- **npm**  
+- **pip** (Python package manager)
+
+---
+
+### 🚀 Setup Instructions
+
 ```bash
 # 1. Clone the repository
-git clone (https://github.com/Khalaf649/SignalVistaHub).git
+git clone https://github.com/Khalaf649/SignalVistaHub.git
 cd SignalVistaHub
-
-# 2. Install client dependencies
+# 2. Install and run the client
 cd client
 npm install
 npm run dev
-
-# 3. Install server dependencies
+# The client will start on http://localhost:5173 (default for Vite)
+# 3. Install and run the server
 cd ../server
 pip install -r requirements.txt
+uvicorn main:app --reload
+# The server will start on http://127.0.0.1:8000
 
-# 4. Run the server
-uvicorn main:app --reload    
-```
