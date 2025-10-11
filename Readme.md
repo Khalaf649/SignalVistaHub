@@ -68,8 +68,8 @@ It includes three major analysis modules.
 
 | Feature                      | Description                                     | Image                                               |
 | ---------------------------- | ----------------------------------------------- | --------------------------------------------------- |
-| Multi-channel Plotting       | Simultaneous EEG waveform visualization         | ![EEG  Plot](./assets/eeg_plot.png)                 |
-| Recurrence Plot (2 Channels) | Analyze dynamic recurrence between EEG channels | ![EEG Recurrence Plot](./assets/eeg_recurrence.png) |
+| Multi-channel Plotting       | Simultaneous EEG waveform visualization         | ![EEG  Plot](./assets/eeg_plot.jpeg)                 |
+| Recurrence Plot (2 Channels) | Analyze dynamic recurrence between EEG channels | ![EEG Recurrence Plot](./assets/eeg_recurrence.jpeg) |
 
 ---
 
@@ -85,8 +85,8 @@ It includes three major analysis modules.
 
 | Feature                | Description                                                                                          | Image                                                        |
 | ---------------------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
-| Amplitude vs Time Plot | Visualize the simulated Doppler signal                                                               | ![Amplitude Time Plot](./assets/doppler_amplitude_time.png)  |
-| AI Doppler Prediction  | Predict source frequency & velocity from recorded Doppler signal _(Model excluded — see .gitignore)_ | ![AI Doppler Prediction](./assets/doppler_ai_prediction.png) |
+| Amplitude & Frequency vs Time Plot | Visualize the simulated Doppler signal                                                               | ![Amplitude & Frequency Time Plot](./assets/doppler_plot.jpeg)  |
+| AI Doppler Prediction  | Predict source frequency & velocity from recorded Doppler signal _(Model excluded — see .gitignore)_ | ![AI Doppler Prediction](./assets/doppler_ai_prediction.jpeg) |
 
 ---
 
