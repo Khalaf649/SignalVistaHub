@@ -1,8 +1,8 @@
 "use client";
 import { useState } from "react";
-import EcgCard from "./ecg-card";
+import EcgCard from "./components/ecg-card";
 
-import type ECGData from "../interfaces/ECGData";
+import type ECGData from "../ECG/interfaces/ECGData";
 
 export default function ECGMonitor() {
   const [ecgData, setEcgData] = useState<ECGData | null>(null);

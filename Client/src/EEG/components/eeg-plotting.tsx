@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
-import LinearECG from "./plots/linear-plot";
-import PolarECGPlot from "./plots/polar-plot";
+import LinearECG from "../../components/plots/linear-plot";
+import PolarECGPlot from "../../components/plots/polar-plot";
 import type EEGData from "../interfaces/EEGData";
 
 interface EEGPlotProps {

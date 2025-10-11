@@ -6,11 +6,16 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "./ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+} from "../../components/ui/card";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "../../components/ui/tabs";
 import type EEGData from "../interfaces/EEGData";
-import EEGPlot from "./eeg-plotting";
-import EEGReoccurence from "./eeg-reoccurence";
+import EEGPlot from "../components/eeg-plotting";
+import EEGReoccurence from "../components/eeg-reoccurence";
 
 export default function EEGCard({
   channels,

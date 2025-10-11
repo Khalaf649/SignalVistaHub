@@ -6,8 +6,13 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "./ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+} from "../../components/ui/card";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "../../components/ui/tabs";
 import ECGPlot from "./ecg-plotting";
 import ECGPrediction from "./ecg-prediction";
 import ECGReoccurence from "./ecg-reoccurence";
@@ -47,7 +52,7 @@ export default function ECGCard({ leads, samplingRate, signals }: EcgData) {
             <ECGReoccurence data={{ leads, samplingRate, signals }} />
           </TabsContent>
           <TabsContent value="xor graph" className="space-y-4 mt-4">
-            <ECGXORGraph />
+            <ECGXORGraph data={{ leads, samplingRate, signals }} />
           </TabsContent>
         </Tabs>
       </CardContent>

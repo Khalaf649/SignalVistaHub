@@ -13,6 +13,7 @@ import {
   Filler,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
+import { EllipsisVertical } from "lucide-react";
 
 // Register ChartJS components
 ChartJS.register(
@@ -34,6 +35,7 @@ interface LinearSignalPlotProps {
   signalType: string; // "ECG" or "EEG" for display
   windowDuration: number; // in seconds, default 10s
   speed: number; // Playback speed multiplier, default 1x
+  Normalize?: boolean;
 }
 
 // Color palette for multiple channels
@@ -60,6 +62,7 @@ export default function LinearSignalPlot({
   signalType = "Signal",
   windowDuration,
   speed,
+  Normalize = true,
 }: LinearSignalPlotProps) {
   const [dataBuffer, setDataBuffer] = useState<number[][]>([]);
   const [currentTimeOffset, setCurrentTimeOffset] = useState(0);
@@ -175,7 +178,8 @@ export default function LinearSignalPlot({
         const range = maxY - minY;
         const normalize = (y: number): number => {
           if (range === 0) return 0;
-          return (2 * (y - minY)) / range - 1;
+          if (Normalize) return (2 * (y - minY)) / range - 1;
+          else return y;
         };
 
         return {

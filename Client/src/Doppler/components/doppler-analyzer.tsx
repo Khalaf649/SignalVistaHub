@@ -2,12 +2,12 @@
 
 import type React from "react";
 import { useState, useRef } from "react";
-import { Button } from "./ui/button";
-import { Label } from "./ui/label";
-import { Card } from "./ui/card";
+import { Button } from "../../components/ui/button";
+import { Label } from "../../components/ui/label";
+import { Card } from "../../components/ui/card";
 import { Upload, Volume2, Sparkles } from "lucide-react";
-import { useToast } from "../hooks/use-toast";
-import { predictDoppler } from "../lib/doppler";
+import { useToast } from "../../hooks/use-toast";
+import { predictDoppler } from "../api/doppler";
 
 export default function DopplerAnalyzer() {
   const [audioFile, setAudioFile] = useState<File | null>(null);

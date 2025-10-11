@@ -1,26 +1,26 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import RecurrencePlot from "./plots/recurrence-plot";
-import type ECGData from "../interfaces/ECGData";
+import RecurrencePlot from "../../components/plots/recurrence-plot";
+import type EEGData from "../interfaces/EEGData";
 
-interface ECGReoccurenceProps {
-  data: ECGData;
+interface EEGReoccurenceProps {
+  data: EEGData;
 }
 
-export default function ECGReoccurence({ data }: ECGReoccurenceProps) {
+export default function EEGReoccurence({ data }: EEGReoccurenceProps) {
   const [primaryLead, setPrimaryLead] = useState<string>("");
   const [secondaryLead, setSecondaryLead] = useState<string>("");
 
   // ✅ Extract the channel (column) for each lead, since signals are [samples][channels]
   const channelSignals = useMemo(() => {
-    if (!data.signals || data.signals.length === 0) return [];
-    const numChannels = data.signals[0].length;
+    if (!data.data || data.data.length === 0) return [];
+    const numChannels = data.data[0].length;
     const channels = Array.from({ length: numChannels }, (_, i) =>
-      data.signals.map((row) => row[i])
+      data.data.map((row) => row[i])
     );
     return channels;
-  }, [data.signals]);
+  }, [data.data]);
 
   // ✅ Lead selections
   const handlePrimaryChange = (e: React.ChangeEvent<HTMLSelectElement>) =>
@@ -29,8 +29,8 @@ export default function ECGReoccurence({ data }: ECGReoccurenceProps) {
   const handleSecondaryChange = (e: React.ChangeEvent<HTMLSelectElement>) =>
     setSecondaryLead(e.target.value);
 
-  const channel1Index = data.leads.indexOf(primaryLead);
-  const channel2Index = data.leads.indexOf(secondaryLead);
+  const channel1Index = data.channels.indexOf(primaryLead);
+  const channel2Index = data.channels.indexOf(secondaryLead);
 
   const channel1Data =
     channel1Index !== -1 ? channelSignals[channel1Index] : null;
@@ -59,7 +59,7 @@ export default function ECGReoccurence({ data }: ECGReoccurenceProps) {
             className="border border-gray-300 rounded-md px-2 py-1 text-sm"
           >
             <option value="">-- Select Primary Lead --</option>
-            {data.leads.map((lead) => (
+            {data.channels.map((lead) => (
               <option key={lead} value={lead}>
                 {lead}
               </option>
@@ -76,7 +76,7 @@ export default function ECGReoccurence({ data }: ECGReoccurenceProps) {
             className="border border-gray-300 rounded-md px-2 py-1 text-sm"
           >
             <option value="">-- Select Secondary Lead --</option>
-            {data.leads.map((lead) => (
+            {data.channels.map((lead) => (
               <option key={lead} value={lead}>
                 {lead}
               </option>

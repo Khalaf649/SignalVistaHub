@@ -1,8 +1,8 @@
 "use client";
 import { useState } from "react";
-import type EEGRecording from "../interfaces/EEGData";
-import { preprocessEDF, fetchEEGData } from "../lib/eeg";
-import EEGCard from "./eeg-card";
+import type EEGRecording from "./interfaces/EEGData";
+import { preprocessEDF, fetchEEGData } from "./api/eeg";
+import EEGCard from "./components/eeg-card";
 
 export default function EEGMonitor() {
   const [currentRecording, setCurrentRecording] = useState<EEGRecording | null>(
