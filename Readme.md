@@ -1,5 +1,3 @@
----
-
 ## 📚 Table of Contents
 
 - [About the Project](#-about-the-project)
@@ -14,8 +12,6 @@
 - [Contributors](#-contributors)
 - [Connect with Us](#-connect-with-us)
 - [License](#-license)
-
----
 
 ## 🧩 About the Project
 
@@ -64,16 +60,16 @@ It includes three major analysis modules.
 
 ### 🧠 EEG Analysis
 
-**Expected JSON Input Attributes:**
+**Expected EDF Input Attributes:**
 
 - `signals`: 2D signal matrix _(shape: n_samples × n_channels)_
 
 **Features:**
 
-| Feature                      | Description                                     | Image                                                |
-| ---------------------------- | ----------------------------------------------- | ---------------------------------------------------- |
-| Multi-channel Linear Plot    | Simultaneous EEG waveform visualization         | ![EEG Linear Plot](./assets/eeg_plot.jpeg)           |
-| Recurrence Plot (2 Channels) | Analyze dynamic recurrence between EEG channels | ![EEG Recurrence Plot](./assets/eeg_recurrence.jpeg) |
+| Feature                      | Description                                     | Image                                               |
+| ---------------------------- | ----------------------------------------------- | --------------------------------------------------- |
+| Multi-channel Plotting       | Simultaneous EEG waveform visualization         | ![EEG  Plot](./assets/eeg_plot.png)                 |
+| Recurrence Plot (2 Channels) | Analyze dynamic recurrence between EEG channels | ![EEG Recurrence Plot](./assets/eeg_recurrence.png) |
 
 ---
 
