@@ -5,6 +5,7 @@
   - [ECG Analysis](#ecg-analysis)
   - [EEG Analysis](#eeg-analysis)
   - [Doppler Sound Generation](#doppler-sound-generation)
+  - [Drone Classification](#drone-classification)
 - [Server Overview](#-server-overview)
 - [AI Models](#-ai-models)
 - [Installation & Setup](#-installation--setup)
@@ -119,8 +120,8 @@ The **server** manages:
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/<your-username>/<your-repo-name>.git
-cd <your-repo-name>
+git clone (https://github.com/Khalaf649/SignalVistaHub).git
+cd SignalVistaHub
 
 # 2. Install client dependencies
 cd client
@@ -132,5 +133,5 @@ cd ../server
 pip install -r requirements.txt
 
 # 4. Run the server
-uvicorn main:app --reload    # or node index.js
+uvicorn main:app --reload    
 ```
