@@ -107,45 +107,31 @@ The **server** manages:
 
 ## 🧠 AI Models
 
-| Model            | Task                              | Location                             | Note           |
-| ---------------- | --------------------------------- | ------------------------------------ | -------------- |
-| ECG Model        | Cardiac abnormality detection     | `server/models/ecg_model.pkl`        | Ignored in Git |
-| Doppler Model    | Frequency & velocity prediction   | `server/models/doppler_model.pkl`    | Ignored in Git |
-| Drone Classifier | Drone type classification         | `server/models/drone_classifier.pkl` | Ignored in Git |
-| SAR Model        | Synthetic Aperture Radar analysis | `server/models/sar_model.pkl`        | Ignored in Git |
+| **Model**         | **Task**                           | **Location / Source**                                                                 | **Note** |
+|--------------------|------------------------------------|----------------------------------------------------------------------------------------|-----------|
+| **ECG Model**      | Cardiac abnormality detection      | `server/models/ecg_model.h5`                                                          | Ignored in Git |
+| **Doppler Model**  | Frequency & velocity prediction    | `server/models/doppler_model.h5`                                                      | Ignored in Git |
+| **Drone Classifier** | Drone type recognition and classification | [Hugging Face Model Repository](https://huggingface.co/) *(Hosted remotely — integrated via API or download)* | Not stored locally |
+
 
 ---
 
 ## ⚙️ Installation & Setup
 
-Follow the steps below to set up and run **SignalVistaHub** locally.
-
----
-
-### 🧾 Prerequisites
-Before starting, make sure the following are installed on your system:
-
-- **Node.js** ≥ 18  
-- **Python** ≥ 3.9  
-- **npm**  
-- **pip** (Python package manager)
-
----
-
-### 🚀 Setup Instructions
-
 ```bash
 # 1. Clone the repository
-git clone https://github.com/Khalaf649/SignalVistaHub.git
+git clone (https://github.com/Khalaf649/SignalVistaHub).git
 cd SignalVistaHub
-# 2. Install and run the client
+
+# 2. Install client dependencies
 cd client
 npm install
 npm run dev
-# The client will start on http://localhost:5173 (default for Vite)
-# 3. Install and run the server
+
+# 3. Install server dependencies
 cd ../server
 pip install -r requirements.txt
-uvicorn main:app --reload
-# The server will start on http://127.0.0.1:8000
 
+# 4. Run the server
+uvicorn main:app --reload    
+```
