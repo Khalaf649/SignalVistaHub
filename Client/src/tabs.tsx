@@ -4,7 +4,7 @@ import { lazy, Suspense } from "react";
 const ECGMonitor = lazy(() => import("../src/ECG/ecg-monitor"));
 const DopplerAnalysis = lazy(() => import("../src/Doppler/doppler-analysis"));
 const DroneTelemetry = lazy(() => import("../src/Drone/drone-telemetry"));
-const EEGModule = lazy(() => import("../src/ECG/ecg-monitor"));
+const EEGModule = lazy(() => import("../src/EEG/eeg-monitor"));
 const SARAnalysis = lazy(() => import("../src/SAR/sar-analysis"));
 
 const tabConfig = [

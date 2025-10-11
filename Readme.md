@@ -70,11 +70,10 @@ It includes three major analysis modules.
 
 **Features:**
 
-| Feature                      | Description                                       | Image                                               |
-| ---------------------------- | ------------------------------------------------- | --------------------------------------------------- |
-| Multi-channel Linear Plot    | Simultaneous EEG waveform visualization           | ![EEG Linear Plot](./assets/eeg_linear_plot.png)    |
-| Polar Plot Visualization     | Circular representation of multi-channel EEG data | ![EEG Polar Plot](./assets/eeg_polar_plot.png)      |
-| Recurrence Plot (2 Channels) | Analyze dynamic recurrence between EEG channels   | ![EEG Recurrence Plot](./assets/eeg_recurrence.png) |
+| Feature                      | Description                                     | Image                                                |
+| ---------------------------- | ----------------------------------------------- | ---------------------------------------------------- |
+| Multi-channel Linear Plot    | Simultaneous EEG waveform visualization         | ![EEG Linear Plot](./assets/eeg_plot.jpeg)           |
+| Recurrence Plot (2 Channels) | Analyze dynamic recurrence between EEG channels | ![EEG Recurrence Plot](./assets/eeg_recurrence.jpeg) |
 
 ---
 
