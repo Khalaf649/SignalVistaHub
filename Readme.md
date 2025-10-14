@@ -2,16 +2,16 @@
 
 - [About the Project](#-about-the-project)
 - [Client Overview](#-client-overview)
-  - [ECG Analysis](#ecg-analysis)
-  - [EEG Analysis](#eeg-analysis)
-  - [Doppler Sound Generation](#doppler-sound-generation)
+  - [ECG Analysis](#-ecg-analysis)
+  - [EEG Analysis](#-eeg-analysis)
+  - [Doppler Sound Generation](#-doppler-sound-generation)
+  - [Drone Classification](#-drone-classification)
+  - [SAR Analysis](#-sar-analysis)
 - [Server Overview](#-server-overview)
 - [AI Models](#-ai-models)
 - [Installation & Setup](#-installation--setup)
-- [Contributing](#-contributing)
-- [Contributors](#-contributors)
-- [Connect with Us](#-connect-with-us)
-- [License](#-license)
+
+---
 
 ## 🧩 About the Project
 
@@ -34,10 +34,12 @@ It combines advanced processing and modeling capabilities for:
 >
 > Sensitive and large AI model files are excluded from version control using `.gitignore` for privacy and storage optimization.
 
+---
+
 ## 💻 Client Overview
 
 The **client** provides an intuitive interface for visualizing, analyzing, and exploring **multi-channel signals**.  
-It includes three major analysis modules.
+It includes major analysis modules for ECG, EEG, Doppler, Drone, and SAR signals.
 
 ---
 
@@ -47,9 +49,9 @@ It includes three major analysis modules.
 
 - `signals`: 2D array _(shape: n_samples × n_channels)_
 - `leads`: Array of lead names
-- `samplingRate`: SamplingRate of the readings
+- `samplingRate`: Sampling rate of the readings
 
-### Features
+**Features**
 
 | **Feature**                                 | **Description**                                                                                                                                                                                                                                    | **Illustration**                                 |
 | ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
@@ -58,18 +60,20 @@ It includes three major analysis modules.
 | **Recurrence Plot (Two-Channel Analysis)**  | Computes and visualizes **recurrence relationships** between two ECG leads, aiding in the detection of nonlinear patterns, rhythmic structures, and cross-channel dependencies.                                                                    | ![Recurrence Plot](./assets/ecg_recurrence.jpeg) |
 | **XOR Channel Analysis**                    | Performs a **logical XOR** operation between selected ECG channels to highlight waveform discrepancies, phase shifts, or artifacts across different signal paths.                                                                                  | ![XOR Plot](./assets/ecg_xor.jpeg)               |
 
+---
+
 ### 🧠 EEG Analysis
 
 **Expected EDF Input Attributes:**
 
 - `signals`: 2D signal matrix _(shape: n_samples × n_channels)_
 
-**Features:**
+**Features**
 
-| Feature                      | Description                                     | Image                                               |
-| ---------------------------- | ----------------------------------------------- | --------------------------------------------------- |
-| Multi-channel Plotting       | Simultaneous EEG waveform visualization         | ![EEG  Plot](./assets/eeg_plot.png)                 |
-| Recurrence Plot (2 Channels) | Analyze dynamic recurrence between EEG channels | ![EEG Recurrence Plot](./assets/eeg_recurrence.png) |
+| Feature                      | Description                                     | Image                                                |
+| ---------------------------- | ----------------------------------------------- | ---------------------------------------------------- |
+| Multi-channel Plotting       | Simultaneous EEG waveform visualization         | ![EEG  Plot](./assets/eeg_plot.jpeg)                 |
+| Recurrence Plot (2 Channels) | Analyze dynamic recurrence between EEG channels | ![EEG Recurrence Plot](./assets/eeg_recurrence.jpeg) |
 
 ---
 
@@ -81,37 +85,61 @@ It includes three major analysis modules.
 - Velocity of source
 - Duration
 
-**Features:**
+**Features**
 
-| Feature                | Description                                                                                          | Image                                                        |
-| ---------------------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
-| Amplitude vs Time Plot | Visualize the simulated Doppler signal                                                               | ![Amplitude Time Plot](./assets/doppler_amplitude_time.png)  |
-| AI Doppler Prediction  | Predict source frequency & velocity from recorded Doppler signal _(Model excluded — see .gitignore)_ | ![AI Doppler Prediction](./assets/doppler_ai_prediction.png) |
+| Feature                                | Description                                                                                            | Image                                                          |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------- |
+| **Amplitude & Frequency vs Time Plot** | Visualize the simulated Doppler signal                                                                 | ![Amplitude & Frequency Time Plot](./assets/doppler_plot.jpeg) |
+| **AI Doppler Prediction**              | Predict source frequency & velocity from recorded Doppler signal _(Model excluded — see `.gitignore`)_ | ![AI Doppler Prediction](./assets/doppler_ai_prediction.jpeg)  |
 
 ---
+
+### 🚁 Drone Classification
+
+**Expected Input:**
+
+- Audio or signal sample from drone source
+
+**Features**
+
+| Feature                     | Description                                                                      | Image                                                       |
+| --------------------------- | -------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| **AI-Based Classification** | Identifies drone type using pre-trained models hosted on Hugging Face or locally | ![Drone Classification](./assets/drone_classification.jpeg) |
+
+---
+
+### 🛰️ SAR Analysis
+
+**Expected Input:**
+
+- SAR raw signal or pre-processed SAR image
+
+**Features**
+
+| Feature                 | Description                                                                                   | Image                                         |
+| ----------------------- | --------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| **SAR Image Formation** | Generates SAR images from raw radar echoes using range-Doppler or back-projection algorithms. | ![SAR Formation](./assets/sar_formation.jpeg) |
 
 ## ⚙️ Server Overview
 
 The **server** manages:
 
-- Signal processing requests (ECG, EEG, Doppler)
+- Signal processing requests (ECG, EEG, Doppler, Drone, SAR)
 - AI inference endpoints
 - File handling and normalization
 
 > 🧾 **Notes:**  
-> The server handles JSON uploads, 2D signal arrays,  
-> and integrates with local AI models (ignored in Git).
+> The server handles JSON uploads, 2D signal arrays, and integrates with local AI models (ignored in Git).
 
 ---
 
 ## 🧠 AI Models
 
-| Model            | Task                              | Location                             | Note           |
-| ---------------- | --------------------------------- | ------------------------------------ | -------------- |
-| ECG Model        | Cardiac abnormality detection     | `server/models/ecg_model.pkl`        | Ignored in Git |
-| Doppler Model    | Frequency & velocity prediction   | `server/models/doppler_model.pkl`    | Ignored in Git |
-| Drone Classifier | Drone type classification         | `server/models/drone_classifier.pkl` | Ignored in Git |
-| SAR Model        | Synthetic Aperture Radar analysis | `server/models/sar_model.pkl`        | Ignored in Git |
+| **Model**            | **Task**                                  | **Location / Source**                                                        | **Note**           |
+| -------------------- | ----------------------------------------- | ---------------------------------------------------------------------------- | ------------------ |
+| **ECG Model**        | Cardiac abnormality detection             | `server/models/ecg_model.h5`                                                 | Ignored in Git     |
+| **Doppler Model**    | Frequency & velocity prediction           | `server/models/doppler_model.h5`                                             | Ignored in Git     |
+| **Drone Classifier** | Drone type recognition and classification | [Hugging Face Model Repository](https://huggingface.co/) _(Hosted remotely)_ | Not stored locally |
 
 ---
 
@@ -119,8 +147,8 @@ The **server** manages:
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/<your-username>/<your-repo-name>.git
-cd <your-repo-name>
+git clone https://github.com/Khalaf649/SignalVistaHub.git
+cd SignalVistaHub
 
 # 2. Install client dependencies
 cd client
@@ -132,5 +160,5 @@ cd ../server
 pip install -r requirements.txt
 
 # 4. Run the server
-uvicorn main:app --reload    # or node index.js
+uvicorn main:app --reload
 ```
