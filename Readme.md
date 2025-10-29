@@ -1,16 +1,16 @@
 ## 📚 Table of Contents
 
-- [About the Project](#about-the-project)
-- [Client Overview](#client-overview)
-  - [ECG Analysis](#ecg-analysis)
-  - [EEG Analysis](#eeg-analysis)
-  - [Audio Sampling (Gender Recognition)](#audio-sampling-gender-recognition)
-  - [Doppler Sound Generation](#doppler-sound-generation)
-  - [Drone Classification](#drone-classification)
-  - [SAR Analysis](#sar-analysis)
-- [Server Overview](#server-overview)
-- [AI Models](#ai-models)
-- [Installation & Setup](#installation--setup)
+- [About the Project](#-about-the-project)
+- [Client Overview](#-client-overview)
+  - [ECG Analysis](#-ecg-analysis)
+  - [EEG Analysis](#-eeg-analysis)
+  - [Audio Sampling (Gender Recognition)](#-audio-sampling-gender-recognition)
+  - [Doppler Sound Generation](#-doppler-sound-generation)
+  - [Drone Classification](#-drone-classification)
+  - [SAR Analysis](#-sar-analysis)
+- [Server Overview](#-server-overview)
+- [AI Models](#-ai-models)
+- [Installation & Setup](#-installation--setup)
 
 ---
 
@@ -36,8 +36,6 @@ It combines advanced processing and modeling capabilities for:
 >
 > Sensitive and large AI model files are excluded from version control using `.gitignore` for privacy and storage optimization.
 
-[🔝 Back to Top](#-table-of-contents)
-
 ---
 
 ## 💻 Client Overview
@@ -45,7 +43,6 @@ It combines advanced processing and modeling capabilities for:
 The **client** provides an intuitive interface for visualizing, analyzing, and exploring **multi-channel signals**.  
 It includes major analysis modules for ECG, EEG, Audio Sampling, Doppler, Drone, and SAR signals.
 
-[🔝 Back to Top](#-table-of-contents)
 
 ---
 
@@ -66,7 +63,6 @@ It includes major analysis modules for ECG, EEG, Audio Sampling, Doppler, Drone,
 | **XOR Channel Analysis**                    | Performs a **logical XOR** operation between selected ECG channels to highlight waveform discrepancies, phase shifts, or artifacts across different signal paths.                                                                                  | ![XOR Plot](./assets/ecg_xor.jpeg)               |
 | **Downsampling**                            | Reduces ECG sampling rate to enhance processing speed and simplify visualization without losing essential waveform features.                                                                                | *(Image placeholder)*                            |
 
-[🔝 Back to Top](#-table-of-contents)
 
 ---
 
@@ -83,7 +79,6 @@ It includes major analysis modules for ECG, EEG, Audio Sampling, Doppler, Drone,
 | **Recurrence Plot (2 Ch)**  | Analyze dynamic recurrence between EEG channels                                | ![EEG Recurrence Plot](./assets/eeg_recurrence.jpeg) |
 | **Downsampling**            | Reduces EEG signal resolution to focus on main frequency bands and smooth noisy data. | *(Image placeholder)*                         |
 
-[🔝 Back to Top](#-table-of-contents)
 
 ---
 
@@ -100,7 +95,6 @@ It includes major analysis modules for ECG, EEG, Audio Sampling, Doppler, Drone,
 | **Gender Classification (AI Model)** | Identifies gender (Male/Female) using trained neural network models. | *(Image placeholder)* |
 | **Audio Signal Visualization (After Anti-Aliasing)** | Shows the cleaned and filtered version of the signal after anti-aliasing. | *(Image placeholder)* |
 
-[🔝 Back to Top](#-table-of-contents)
 
 ---
 
@@ -118,7 +112,6 @@ It includes major analysis modules for ECG, EEG, Audio Sampling, Doppler, Drone,
 | **Amplitude & Frequency vs Time Plot**     | Visualize the simulated Doppler signal                                                                     | ![Amplitude & Frequency Time Plot](./assets/doppler_plot.jpeg)     |
 | **AI Doppler Prediction**                  | Predict source frequency & velocity from recorded Doppler signal _(Model excluded — see `.gitignore`)_     | ![AI Doppler Prediction](./assets/doppler_ai_prediction.jpeg)      |
 
-[🔝 Back to Top](#-table-of-contents)
 
 ---
 
@@ -133,7 +126,6 @@ It includes major analysis modules for ECG, EEG, Audio Sampling, Doppler, Drone,
 | -------------------------- | ----------------------------------------------------------------------------------- | -------------------------------------------------- |
 | **AI-Based Classification** | Identifies drone type using pre-trained models hosted on Hugging Face or locally | ![Drone Classification](./assets/drone_classification.jpeg) |
 
-[🔝 Back to Top](#-table-of-contents)
 
 ---
 
@@ -148,7 +140,6 @@ It includes major analysis modules for ECG, EEG, Audio Sampling, Doppler, Drone,
 | ---------------------------- | ----------------------------------------------------------------------------------------------- | --------------------------------------------- |
 | **SAR Image Formation**      | Generates SAR images from raw radar echoes using range-Doppler or back-projection algorithms.   | ![SAR Formation](./assets/sar_formation.jpeg) |
 
-[🔝 Back to Top](#-table-of-contents)
 
 ---
 
@@ -163,7 +154,6 @@ The **server** manages:
 > 🧾 **Notes:**  
 > The server handles JSON uploads, 2D signal arrays, and integrates with local AI models (ignored in Git).
 
-[🔝 Back to Top](#-table-of-contents)
 
 ---
 
@@ -177,7 +167,6 @@ The **server** manages:
 | **Doppler Model**    | Frequency & velocity prediction           | `server/models/doppler_model.h5`                                             | Ignored in Git     |
 | **Drone Classifier** | Drone type recognition and classification | [Hugging Face Model Repository](https://huggingface.co/) _(Hosted remotely)_ | Not stored locally |
 
-[🔝 Back to Top](#-table-of-contents)
 
 ---
 
